@@ -9,69 +9,69 @@ services:
   pd0:
     image: pingcap/pd:latest
     ports:
-      - "2379"
+      - "5000"
     volumes:
       - ./config/pd.toml:/pd.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
       - --name=pd0
-      - --client-urls=http://0.0.0.0:2379
-      - --peer-urls=http://0.0.0.0:2380
-      - --advertise-client-urls=http://pd0:2379
-      - --advertise-peer-urls=http://pd0:2380
-      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --client-urls=http://0.0.0.0:5000
+      - --peer-urls=http://0.0.0.0:5001
+      - --advertise-client-urls=http://pd0:5000
+      - --advertise-peer-urls=http://pd0:5001
+      - --initial-cluster=pd0=http://pd0:5001,pd1=http://pd1:5001,pd2=http://pd2:5001
       - --data-dir=/data/pd0
       - --config=/pd.toml
       - --log-file=/logs/pd0.log
   pd1:
     image: pingcap/pd:latest
     ports:
-      - "2379"
+      - "5000"
     volumes:
       - ./config/pd.toml:/pd.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
       - --name=pd1
-      - --client-urls=http://0.0.0.0:2379
-      - --peer-urls=http://0.0.0.0:2380
-      - --advertise-client-urls=http://pd1:2379
-      - --advertise-peer-urls=http://pd1:2380
-      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --client-urls=http://0.0.0.0:5000
+      - --peer-urls=http://0.0.0.0:5001
+      - --advertise-client-urls=http://pd1:5000
+      - --advertise-peer-urls=http://pd1:5001
+      - --initial-cluster=pd0=http://pd0:5001,pd1=http://pd1:5001,pd2=http://pd2:5001
       - --data-dir=/data/pd1
       - --config=/pd.toml
       - --log-file=/logs/pd1.log
   pd2:
     image: pingcap/pd:latest
     ports:
-      - "2379"
+      - "5000"
     volumes:
       - ./config/pd.toml:/pd.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
       - --name=pd2
-      - --client-urls=http://0.0.0.0:2379
-      - --peer-urls=http://0.0.0.0:2380
-      - --advertise-client-urls=http://pd2:2379
-      - --advertise-peer-urls=http://pd2:2380
-      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --client-urls=http://0.0.0.0:5000
+      - --peer-urls=http://0.0.0.0:5001
+      - --advertise-client-urls=http://pd2:5000
+      - --advertise-peer-urls=http://pd2:5001
+      - --initial-cluster=pd0=http://pd0:5001,pd1=http://pd1:5001,pd2=http://pd2:5001
       - --data-dir=/data/pd2
       - --config=/pd.toml
       - --log-file=/logs/pd2.log
   tikv:
     image: pingcap/tikv:latest
     ports:
-        - target: 20160
-          published: 20160
+        - target: 5002
+          published: 5002
     environment:
       - TASK_SLOT={{.Task.Slot}}
     volumes:
       - ./config/tikv.toml:/tikv.toml:ro
       - ./data:/data
       - ./logs:/logs
-    entrypoint: [ "/bin/sh", "-c", "/tikv-server --advertise-addr=$$HOSTNAME:20160 --addr=0.0.0.0:20160 --data-dir=/data/tikv$$TASK_SLOT --pd=pd0:2379,pd1:2379,pd2:2379 --config=/tikv.toml --log-file=/logs/tikv$$TASK_SLOT.log --log-level=info" ]
+    entrypoint: [ "/bin/sh", "-c", "/tikv-server --advertise-addr=$$HOSTNAME:5002 --addr=0.0.0.0:5002 --data-dir=/data/tikv$$TASK_SLOT --pd=pd0:5000,pd1:5000,pd2:5000 --config=/tikv.toml --log-file=/logs/tikv$$TASK_SLOT.log --log-level=info" ]
     depends_on:
       - "pd0"
       - "pd1"
@@ -84,16 +84,16 @@ services:
   tidb:
     image: pingcap/tidb:latest
     ports:
-        - target: 4000
-          published: 4000
-        - target: 10080
-          published: 10080
+        - target: 5003
+          published: 5003
+        - target: 5004
+          published: 5004
     environment:
       - TASK_SLOT={{.Task.Slot}}
     volumes:
       - ./config/tidb.toml:/tidb.toml:ro
       - ./logs:/logs
-    entrypoint: [ "/bin/sh", "-c", "/tidb-server --advertise-address=$$HOSTNAME --store=tikv --path=pd0:2379,pd1:2379,pd2:2379 --config=/tidb.toml --log-file=/logs/tidb$$TASK_SLOT.log -L info" ]
+    entrypoint: [ "/bin/sh", "-c", "/tidb-server --advertise-address=$$HOSTNAME --store=tikv --path=pd0:5000,pd1:5000,pd2:5000 --config=/tidb.toml --log-file=/logs/tidb$$TASK_SLOT.log -L info" ]
     depends_on:
       - "tikv"
     deploy:
