@@ -3,15 +3,15 @@
 name = "pd"
 data-dir = "default.pd"
 
-client-urls = "http://127.0.0.1:2379"
+client-urls = "http://127.0.0.1:5000"
 # if not set, use ${client-urls}
 advertise-client-urls = ""
 
-peer-urls = "http://127.0.0.1:2380"
+peer-urls = "http://127.0.0.1:5001"
 # if not set, use ${peer-urls}
 advertise-peer-urls = ""
 
-initial-cluster = "pd=http://127.0.0.1:2380"
+initial-cluster = "pd=http://127.0.0.1:5001"
 initial-cluster-state = "new"
 
 lease = 3
